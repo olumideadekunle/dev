@@ -107,7 +107,10 @@ mcpServer.tool("build-transaction", "Build a transfer transaction", buildTransac
     return {
         content: [{
             type: "text",
-            text: `Frozen transaction (base64): ${base64Tx}`
+            text: JSON.stringify({
+                transaction: base64Tx,
+                info: "This is a frozen transaction that needs to be signed before sending"
+            })
         }]
     };
 });

@@ -125,13 +125,15 @@ async function main() {
             const txText = buildTransactionResult.content[0].text;
             console.log("Transaction built:", txText);
 
-            // Extract the base64 transaction
-            const txMatch = txText.match(/Frozen transaction \(base64\): (.+)/);
-            if (txMatch && txMatch[1]) {
-                base64Tx = txMatch[1];
+            // Parse the JSON response
+            try {
+                const txData = JSON.parse(txText);
+                base64Tx = txData.transaction;
                 console.log("Extracted base64 transaction");
-            } else {
-                console.error("Couldn't extract transaction from response");
+                console.log("Info:", txData.info);
+            } catch (error) {
+                console.error("Error parsing transaction data:", error);
+                console.log("Raw response:", txText);
                 return;
             }
         } else {
