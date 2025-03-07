@@ -12,7 +12,7 @@ A Model Context Protocol (MCP) server for interacting with the Hedera network. T
 
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/hedera-dev/hedera-mcp-server.git
    cd hedera-mcp-server
    ```
 
