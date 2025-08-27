@@ -6,7 +6,7 @@ dotenv.config();
 
 // Define async main function to use await
 async function main() {
-    console.log("Starting Hedera MCP test client...");
+    console.log("Starting Hedera MCP test client... - test-client.js:9");
 
     // Create SSE transport to connect to the server
     // The server is running on port 3000 by default
@@ -37,23 +37,23 @@ async function main() {
 
     try {
         // Connect to the server
-        console.log("Connecting to Hedera MCP server...");
+        console.log("Connecting to Hedera MCP server... - test-client.js:40");
         await client.connect(transport);
-        console.log("Connected successfully!");
+        console.log("Connected successfully! - test-client.js:42");
 
         // List available tools
-        console.log("\nListing available tools:");
+        console.log("\nListing available tools: - test-client.js:45");
         const tools = await client.listTools();
         console.log(JSON.stringify(tools, null, 2));
 
         // 1. STEP 1: Create a new wallet/account
-        console.log("\n========== STEP 1: Create New Account ==========");
+        console.log("\n========== STEP 1: Create New Account ========== - test-client.js:50");
         const createWalletResult = await client.callTool({
             name: "create-wallet",
             arguments: {}  // This tool doesn't require any arguments
         });
 
-        console.log("\nWallet created successfully!");
+        console.log("\nWallet created successfully! - test-client.js:56");
 
         // Parse the wallet information
         let walletData;
@@ -61,22 +61,22 @@ async function main() {
             const textContent = createWalletResult.content[0].text;
             try {
                 walletData = JSON.parse(textContent);
-                console.log("Wallet Information:");
-                console.log(`Account ID: ${walletData.accountId}`);
-                console.log(`EVM Address: ${walletData.evmAddress}`);
-                console.log(`Private Key: ${walletData.privateKey}`);
+                console.log("Wallet Information: - test-client.js:64");
+                console.log(`Account ID: ${walletData.accountId} - test-client.js:65`);
+                console.log(`EVM Address: ${walletData.evmAddress} - test-client.js:66`);
+                console.log(`Private Key: ${walletData.privateKey} - test-client.js:67`);
             } catch (error) {
-                console.error("Error parsing wallet data:", error);
-                console.log("Raw response:", textContent);
+                console.error("Error parsing wallet data: - test-client.js:69", error);
+                console.log("Raw response: - test-client.js:70", textContent);
                 return;
             }
         } else {
-            console.log("Unexpected response format:", createWalletResult);
+            console.log("Unexpected response format: - test-client.js:74", createWalletResult);
             return;
         }
 
         // 2. STEP 2: Check the balance of the newly created account
-        console.log("\n========== STEP 2: Check Account Balance ==========");
+        console.log("\n========== STEP 2: Check Account Balance ========== - test-client.js:79");
         const checkBalanceResult = await client.callTool({
             name: "check-balance",
             arguments: {
@@ -88,16 +88,16 @@ async function main() {
         let balance = 0;
         if (checkBalanceResult.content && Array.isArray(checkBalanceResult.content) && checkBalanceResult.content.length > 0) {
             const balanceText = checkBalanceResult.content[0].text;
-            console.log("Balance Information:", balanceText);
+            console.log("Balance Information: - test-client.js:91", balanceText);
 
             // Extract the balance value from the text (format: "Balance for account X: Y tinybars")
             const balanceMatch = balanceText.match(/: (\d+) tinybars/);
             if (balanceMatch && balanceMatch[1]) {
                 balance = parseInt(balanceMatch[1], 10);
-                console.log(`Extracted balance: ${balance} tinybars`);
+                console.log(`Extracted balance: ${balance} tinybars - test-client.js:97`);
             }
         } else {
-            console.log("Unexpected response format:", checkBalanceResult);
+            console.log("Unexpected response format: - test-client.js:100", checkBalanceResult);
             return;
         }
 
@@ -105,7 +105,7 @@ async function main() {
         // - sender is the newly created account
         // - recipient is the operator (we'll use the env var from the server)
         // - amount is the balance of the account
-        console.log("\n========== STEP 3: Build Transaction ==========");
+        console.log("\n========== STEP 3: Build Transaction ========== - test-client.js:108");
 
         // We'll assume operator ID comes from the server - we'll just use the full balance from the newly created account
         const operatorId = process.env.HEDERA_OPERATOR_ID || "0.0.2"; // fallback for testing
@@ -123,26 +123,26 @@ async function main() {
         let base64Tx;
         if (buildTransactionResult.content && Array.isArray(buildTransactionResult.content) && buildTransactionResult.content.length > 0) {
             const txText = buildTransactionResult.content[0].text;
-            console.log("Transaction built:", txText);
+            console.log("Transaction built: - test-client.js:126", txText);
 
             // Parse the JSON response
             try {
                 const txData = JSON.parse(txText);
                 base64Tx = txData.transaction;
-                console.log("Extracted base64 transaction");
-                console.log("Info:", txData.info);
+                console.log("Extracted base64 transaction - test-client.js:132");
+                console.log("Info: - test-client.js:133", txData.info);
             } catch (error) {
-                console.error("Error parsing transaction data:", error);
-                console.log("Raw response:", txText);
+                console.error("Error parsing transaction data: - test-client.js:135", error);
+                console.log("Raw response: - test-client.js:136", txText);
                 return;
             }
         } else {
-            console.log("Unexpected response format:", buildTransactionResult);
+            console.log("Unexpected response format: - test-client.js:140", buildTransactionResult);
             return;
         }
 
         // 4. STEP 4: Sign the transaction and submit it
-        console.log("\n========== STEP 4: Sign and Send Transaction ==========");
+        console.log("\n========== STEP 4: Sign and Send Transaction ========== - test-client.js:145");
 
         // Decode the base64 transaction
         const txBytes = Buffer.from(base64Tx, "base64");
@@ -169,19 +169,19 @@ async function main() {
         // Display the result
         if (sendTransactionResult.content && Array.isArray(sendTransactionResult.content) && sendTransactionResult.content.length > 0) {
             const resultText = sendTransactionResult.content[0].text;
-            console.log("Transaction Result:", resultText);
+            console.log("Transaction Result: - test-client.js:172", resultText);
         } else {
-            console.log("Unexpected response format:", sendTransactionResult);
+            console.log("Unexpected response format: - test-client.js:174", sendTransactionResult);
         }
 
-        console.log("\n========== END-TO-END TEST COMPLETED ==========");
+        console.log("\n========== ENDTOEND TEST COMPLETED ========== - test-client.js:177");
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error: - test-client.js:180", error);
     } finally {
         // Close the transport connection
         transport.close();
-        console.log("\nDisconnected from server");
+        console.log("\nDisconnected from server - test-client.js:184");
     }
 }
 
